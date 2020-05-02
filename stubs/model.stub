@@ -1,0 +1,10 @@
+<?php
+
+namespace {{ namespace }};
+
+use App\Models\AbstractModel;
+
+class {{ class }} extends AbstractModel
+{
+    //
+}

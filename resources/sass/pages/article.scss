@@ -1,0 +1,14 @@
+.article {
+
+}
+
+a.external {
+    background-position: center right;
+    background-repeat: no-repeat;
+    background-image: linear-gradient(transparent,transparent), url('/assets/icons/external-link-ltr-icon.svg');
+    padding-right: 13px;
+}
+
+.flagicon {
+    height: 12px;
+}
