@@ -43,4 +43,9 @@ class PostgresDatabase extends Model
 
         return $collection;
     }
+
+    public static function isMigrated(): bool
+    {
+        return \Schema::hasTable('migrations');
+    }
 }
