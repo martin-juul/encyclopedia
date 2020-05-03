@@ -20,7 +20,7 @@ class RequestLogger
      */
     public function handle($request, Closure $next)
     {
-        $request->attributes->add(['request_id' => RequestId::getId()]);
+        $request->attributes->add(['request_id' => RequestId::get()]);
 
         return $next($request);
     }
