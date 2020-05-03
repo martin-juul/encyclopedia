@@ -7,7 +7,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 /**
  * Class ProfileResource
  * @package App\Http\Resources\Sys
- * @mixin \App\Models\Sys\Profile
+ * @mixin \App\Models\Sys\ProfileReport
  */
 class ProfileResource extends JsonResource
 {

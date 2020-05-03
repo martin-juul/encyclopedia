@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands\Profile;
 
-use App\Models\Sys\Profile;
+use App\Models\Sys\ProfileReport;
 use Illuminate\Console\Command;
 
 class FlushRecords extends Command
@@ -27,7 +27,7 @@ class FlushRecords extends Command
      */
     public function handle()
     {
-        Profile::truncate();
+        ProfileReport::truncate();
 
         $this->info('Truncated profiles table');
     }

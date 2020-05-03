@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Models\Sys\Profile;
+use App\Models\Sys\ProfileReport;
 use App\Profiling\Context\RequestContext;
 use App\Profiling\XHProf;
 use Closure;
@@ -32,7 +32,7 @@ class ProfileRequest
         $xhprof = app(XHProf::class)->stop();
         $context = new RequestContext($request);
 
-        Profile::create([
+        ProfileReport::create([
             'category' => $context->category,
             'context'  => $context->toArray(),
             'xhprof'   => $xhprof,

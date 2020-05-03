@@ -2,7 +2,7 @@
 
 namespace App\Profiling;
 
-use App\Models\Sys\Profile;
+use App\Models\Sys\ProfileReport;
 
 class XHProfReport
 {
@@ -18,19 +18,33 @@ class XHProfReport
     private array $exclusiveKeys = ['ct', 'mu', 'wt', 'cpu', 'pmu'];
     private int $functionCount = 0;
 
-    public function __construct(Profile $profile)
+    /**
+     * XHProfReport constructor.
+     *
+     * @param \App\Models\Sys\ProfileReport|array $profile
+     */
+    public function __construct($profile)
     {
-        $this->data = $profile->xhprof;
+        if ($profile instanceof ProfileReport) {
+            $this->data = $profile->xhprof;
+        } else if (array_key_exists('xhprof', $profile)) {
+            $this->data = $profile['xhprof'];
+        } else if (is_array($profile)) {
+            $this->data = $profile;
+        } else {
+            throw new \InvalidArgumentException('$profile must be an array');
+        }
+
         $this->original = $this->process();
     }
 
     public function getMainRuntime(): array
     {
         return [
-            'cpu'               => $this->original['main()']['cpu'],
-            'memory_usage'      => $this->original['main()']['mu'],
-            'peak_memory_usage' => $this->original['main()']['pmu'],
-            'walltime'          => $this->original['main()']['wt'],
+            'cpu'               => $this->original['main()']['cpu'] ?? null,
+            'memory_usage'      => $this->original['main()']['mu'] ?? null,
+            'peak_memory_usage' => $this->original['main()']['pmu'] ?? null,
+            'wall_time'         => $this->original['main()']['wt'] ?? null,
         ];
     }
 

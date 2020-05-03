@@ -3,6 +3,7 @@
 namespace App\Profiling;
 
 use App\Exceptions\Profiling\XHProfExtensionMissing;
+use App\Models\Sys\PostgresDatabase;
 
 class XHProf
 {
@@ -29,6 +30,11 @@ class XHProf
 
     public function start(?int $flags = null, array $options = []): void
     {
+        // safeguard against non-migrated database
+        if (!PostgresDatabase::isMigrated()) {
+            return;
+        }
+
         if (!$this->sampleOnly) {
             if (!$flags) {
                 /** @noinspection CallableParameterUseCaseInTypeContextInspection */
