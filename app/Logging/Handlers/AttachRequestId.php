@@ -2,6 +2,7 @@
 
 namespace App\Logging\Handlers;
 
+use App\Facades\RequestId;
 use Monolog\Formatter\LineFormatter;
 use Psr\Log\LoggerInterface;
 
@@ -9,7 +10,7 @@ class AttachRequestId
 {
     public function __invoke(LoggerInterface $logger)
     {
-        if (!method_exists($logger, 'getHandlers')) {
+        if (!method_exists($logger, 'getHandlers') || app()->runningInConsole()) {
             return;
         }
 
@@ -20,7 +21,7 @@ class AttachRequestId
 
     protected function getFormatter(): LineFormatter
     {
-        $id = app('request_id');
+        $id = RequestId::get();
 
         $format = str_replace('[%datetime%] ', "[%datetime%] {$id} ", LineFormatter::SIMPLE_FORMAT);
 
