@@ -14,6 +14,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $middleware = [
+        \App\Http\Middleware\RequestLogger::class,
         \App\Http\Middleware\TrustProxies::class,
         \Fruitcake\Cors\HandleCors::class,
         \App\Http\Middleware\CheckForMaintenanceMode::class,
@@ -32,14 +33,17 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
-            // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
+        'dashboard' => [
+            \Illuminate\Session\Middleware\AuthenticateSession::class,
+        ],
+
         'api' => [
-            'throttle:60,1',
+            'json',
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
@@ -60,6 +64,7 @@ class Kernel extends HttpKernel
         'can'                => \Illuminate\Auth\Middleware\Authorize::class,
         'doNotCacheResponse' => \Spatie\ResponseCache\Middlewares\DoNotCacheResponse::class,
         'guest'              => \App\Http\Middleware\RedirectIfAuthenticated::class,
+        'json'               => \App\Http\Middleware\ForceJsonResponse::class,
         'password.confirm'   => \Illuminate\Auth\Middleware\RequirePassword::class,
         'profile'            => \App\Http\Middleware\ProfileRequest::class,
         'signed'             => \Illuminate\Routing\Middleware\ValidateSignature::class,
