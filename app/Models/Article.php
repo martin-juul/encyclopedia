@@ -65,6 +65,16 @@ class Article extends AbstractModel
         'revision_time' => 'datetime',
     ];
 
+    /**
+     * Wikitext uses the title (case-sensitive) as the route key
+     *
+     * @return string
+     */
+    public function getRouteKeyName(): string
+    {
+        return 'title';
+    }
+
     public function searchableAs(): string
     {
         return 'articles';
