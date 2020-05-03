@@ -194,6 +194,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\RequestIdProvider::class,
         App\Providers\ModelObserverProvider::class,
+        App\Providers\ViewComposerProvider::class,
 
     ],
 
