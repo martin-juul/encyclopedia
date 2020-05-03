@@ -64,12 +64,6 @@ class ArticleController extends Controller
         ]);
     }
 
-    public function searchApi(Request $request)
-    {
-        $results = Article::search($request->query('q'))->paginate();
-
-        return ArticleResource::collection($results);
-    }
 
     public function searchView(Request $request)
     {
