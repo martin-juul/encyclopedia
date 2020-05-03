@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres:12-alpine
+    environment:
+      - POSTGRES_USER=encyclopedia
+      - POSTGRES_DB=encyclopedia
+      - POSTGRES_PASSWORD=secret
+    ports:
+      - 5432:5432
+    networks:
+      - back-tier
+    volumes:
+      - pgstore:/encylopedia
+
+  redis:
+    image: redis:5-alpine
+    networks:
+      - back-tier
+    ports:
+      - 6379:6379
+
+  meilisearch:
+    image: getmeili/meilisearch
+    environment:
+      - MEILI_ENV=development
+      - MEILI_NO_ANALYTICS=true
+    ports:
+      - 7700:7700
+    networks:
+      - back-tier
+    volumes:
+      - mellistore:/data.ms
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: always
+    networks:
+      - back-tier
+    ports:
+      - 1025:1025
+      - 8025:8025
+
+volumes:
+  pgstore:
+  mellistore:
+
+networks:
+  back-tier:
