@@ -1,8 +1,8 @@
 <?php
 
+use App\Logging\Channel;
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogUdpHandler;
 
 return [
 
@@ -53,7 +53,7 @@ return [
             'level'  => 'debug',
         ],
 
-        'job_daily' => [
+        Channel::JOBS => [
             'driver' => 'daily',
             'path'   => storage_path('logs/jobs.log'),
             'level'  => 'debug',
@@ -65,6 +65,15 @@ return [
             'path'   => storage_path('logs/application_daily.log'),
             'level'  => 'debug',
             'days'   => 1,
+            'tap'    => [App\Logging\Handlers\AttachRequestId::class],
+        ],
+
+        Channel::REQUESTS => [
+            'driver' => 'daily',
+            'path'   => storage_path('logs/requests.log'),
+            'level'  => 'debug',
+            'days'   => 1,
+            'tap'    => [App\Logging\Handlers\AttachRequestId::class],
         ],
 
         'slack' => [
@@ -73,16 +82,6 @@ return [
             'username' => 'Laravel Log',
             'emoji'    => ':boom:',
             'level'    => 'critical',
-        ],
-
-        'papertrail' => [
-            'driver'       => 'monolog',
-            'level'        => 'debug',
-            'handler'      => SyslogUdpHandler::class,
-            'handler_with' => [
-                'host' => env('PAPERTRAIL_URL'),
-                'port' => env('PAPERTRAIL_PORT'),
-            ],
         ],
 
         'stderr' => [
@@ -121,7 +120,9 @@ return [
         ],
 
         'emergency' => [
-            'path' => storage_path('logs/laravel.log'),
+            'driver' => 'daily',
+            'path'   => storage_path('logs/emergency.log'),
+            'days'   => 1,
         ],
     ],
 
