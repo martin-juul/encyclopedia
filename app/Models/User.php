@@ -5,11 +5,13 @@ namespace App\Models;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 
 /**
  * App\Models\User
  *
  * @property int $id
+ * @property bool $is_admin
  * @property string $name
  * @property string $email
  * @property \Illuminate\Support\Carbon|null $email_verified_at
@@ -26,6 +28,7 @@ use Illuminate\Notifications\Notifiable;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmail($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereEmailVerifiedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereIsAdmin($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\User whereRememberToken($value)
@@ -70,5 +73,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function isAdmin(): bool
     {
         return $this->is_admin = true;
+    }
+
+    public function setEmailAttribute(string $email): void
+    {
+        $this->attributes['email'] = Str::lower($email);
     }
 }
