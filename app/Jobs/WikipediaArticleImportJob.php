@@ -159,15 +159,13 @@ class WikipediaArticleImportJob implements ShouldQueue
      */
     private function formatArticle(WikiPage $article): array
     {
-        $description = StrExt::between($article->wikiText->text, '{{short description|', '}}');
-
         $data = [
             'title'             => $article->title,
             'article_id'        => $article->wikiText->id,
             'article_parent_id' => $article->wikiText->parent_id,
             'comment'           => $article->wikiText->comment,
             'text'              => $article->wikiText->text,
-            'description'       => $description,
+            'description'       => $article->shortDescription,
             'sha1'              => $article->wikiText->sha1,
             'redirect'          => $article->redirectTitle,
             'revision_time'     => Carbon::createFromTimeString($article->wikiText->timestamp),

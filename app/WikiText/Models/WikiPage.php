@@ -2,14 +2,18 @@
 
 namespace App\WikiText\Models;
 
+use App\Utilities\Extensions\StrExt;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 
 class WikiPage implements Arrayable
 {
-    public string $title;
-    public int $ns;
     public int $id;
+    public int $ns;
+
+    public string $title;
+    public ?string $shortDescription;
+
     public ?string $redirectTitle;
     public WikiText $wikiText;
 
@@ -21,7 +25,9 @@ class WikiPage implements Arrayable
         $this->ns = (int)Arr::get($node, 'ns');
         $this->id = (int)Arr::get($node, 'id');
         $this->setRedirectTitle((array)Arr::get($node, 'redirect'));
+
         $this->setWikiText((array)$node['revision']);
+        $this->shortDescription = $this->getShortDescription();
     }
 
     public function toArray(): array
@@ -81,5 +87,14 @@ class WikiPage implements Arrayable
         $text = $text['0'];
 
         $this->wikiText = new WikiText($id, $parent_id, $timestamp, $contributor, $comment, $text, $sha1);
+    }
+
+    protected function getShortDescription(): ?string
+    {
+        if (!$this->wikiText) {
+            return null;
+        }
+
+        return StrExt::between($this->wikiText->text, '{{short description|', '}}');
     }
 }
