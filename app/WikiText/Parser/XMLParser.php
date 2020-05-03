@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Parser;
+namespace App\WikiText\Parser;
 
 use App\Utilities\Filesystem\Path;
 

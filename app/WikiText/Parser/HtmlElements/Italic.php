@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utilities\Parser\WikiText\HtmlElements;
+namespace App\WikiText\Parser\HtmlElements;
 
 use Illuminate\Contracts\Support\Htmlable;
 
-class Bold implements Htmlable
+class Italic implements Htmlable
 {
     public string $text;
 
@@ -15,6 +15,6 @@ class Bold implements Htmlable
 
     public function toHtml()
     {
-        return "<b>{$this->text}</b>";
+        return "<i>{$this->text}</i>";
     }
 }

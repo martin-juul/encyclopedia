@@ -6,8 +6,8 @@ use App\Jobs\Traits\Logging;
 use App\Models\Article;
 use App\Utilities\Extensions\StrExt;
 use App\Utilities\GC;
-use App\Utilities\Parser\Wikipedia\ArticleMultistreamParser;
-use App\Utilities\Parser\Wikipedia\Models\WikiPage;
+use App\WikiText\Models\WikiPage;
+use App\WikiText\Parser\Parser;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -49,7 +49,7 @@ class WikipediaArticleImportJob implements ShouldQueue
     {
         Article::disableSearchSyncing();
 
-        $parser = new ArticleMultistreamParser($this->path);
+        $parser = new Parser($this->path);
 
         foreach ($parser->read('mediawiki/page') as $node) {
             if (!$node) {
@@ -153,7 +153,7 @@ class WikipediaArticleImportJob implements ShouldQueue
     }
 
     /**
-     * @param \App\Utilities\Parser\Wikipedia\Models\WikiPage $article
+     * @param \App\WikiText\Models\WikiPage $article
      *
      * @return array
      */

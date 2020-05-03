@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Utilities\Parser\Wikipedia;
+namespace App\WikiText\Parser;
 
-use App\Utilities\Parser\Wikipedia\Models\WikiPage;
-use App\Utilities\Parser\XMLParser;
+use App\WikiText\Models\WikiPage;
 
-class ArticleMultistreamParser
+class Parser
 {
     protected string $path;
 

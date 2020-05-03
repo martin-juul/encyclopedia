@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Parser\Wikipedia\Models;
+namespace App\WikiText\Models;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
@@ -24,7 +24,7 @@ class WikiPage implements Arrayable
         $this->setWikiText((array)$node['revision']);
     }
 
-    public function toArray()
+    public function toArray(): array
     {
         return [
             'title'    => $this->title,

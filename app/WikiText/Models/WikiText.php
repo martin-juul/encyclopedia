@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Parser\Wikipedia\Models;
+namespace App\WikiText\Models;
 
 class WikiText
 {

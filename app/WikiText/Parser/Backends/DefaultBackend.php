@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Utilities\Parser\WikiText;
+namespace App\WikiText\Parser\Backends;
 
-use Illuminate\Support\Facades\Log;
+use Log;
 
-class DefaultParserBackend
+class DefaultBackend
 {
     private $interwiki;
 

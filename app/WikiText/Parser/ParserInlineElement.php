@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Parser\WikiText;
+namespace App\WikiText\Parser;
 
 /**
  * Stores inline elements

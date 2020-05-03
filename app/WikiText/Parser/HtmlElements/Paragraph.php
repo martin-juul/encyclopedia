@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Utilities\Parser\WikiText\HtmlElements;
+namespace App\WikiText\Parser\HtmlElements;
 
 class Paragraph
 {

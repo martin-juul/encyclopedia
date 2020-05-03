@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Utilities\Parser\WikiText;
+namespace App\WikiText\Parser;
 
-use Illuminate\Support\Str;
+use App\WikiText\Parser\Backends\DefaultBackend;
 use League\ISO3166\ISO3166;
 
 class WikitextParser
@@ -91,7 +91,7 @@ class WikitextParser
 
         // Create lookup table for efficiency
         self::$inlineLookup = self::elementLookupTable(self::$inline);
-        self::$backend = new DefaultParserBackend();
+        self::$backend = new DefaultBackend();
 
         // Line-block elements.
         // These are characters which have a special meaning at the start of lines,
