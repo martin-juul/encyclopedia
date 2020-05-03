@@ -26,5 +26,3 @@ Route::get('{title}/source', 'ArticleController@showSource')
 Route::get('{title}', 'ArticleController@show')
     ->middleware('cache.response')
     ->name('articles.show');
-
-Auth::routes();
