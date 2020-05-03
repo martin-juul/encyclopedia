@@ -125,6 +125,23 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Encoding
+    |--------------------------------------------------------------------------
+    |
+    | The encoding options for the app
+    |
+    */
+
+    'encoding' => [
+        'json' => JSON_THROW_ON_ERROR
+            | JSON_NUMERIC_CHECK
+            | JSON_PRESERVE_ZERO_FRACTION
+            | JSON_UNESCAPED_SLASHES
+            | JSON_UNESCAPED_UNICODE,
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Autoloaded Service Providers
     |--------------------------------------------------------------------------
     |
@@ -175,6 +192,8 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        App\Providers\RequestIdProvider::class,
+        App\Providers\ModelObserverProvider::class,
 
     ],
 
@@ -218,6 +237,7 @@ return [
         'Redirect'     => Illuminate\Support\Facades\Redirect::class,
         'Redis'        => Illuminate\Support\Facades\Redis::class,
         'Request'      => Illuminate\Support\Facades\Request::class,
+        'RequestId'    => App\Facades\RequestId::class,
         'Response'     => Illuminate\Support\Facades\Response::class,
         'Route'        => Illuminate\Support\Facades\Route::class,
         'Schema'       => Illuminate\Support\Facades\Schema::class,
