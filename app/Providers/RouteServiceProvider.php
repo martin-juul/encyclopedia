@@ -21,7 +21,7 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/-/';
+    public const HOME = '/-/dashboard';
 
     /**
      * Define your route model bindings, pattern filters, etc.
@@ -64,7 +64,7 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function mapDashboardRoutes(): void
     {
-        Route::prefix('-/dashboard')
+        Route::prefix('/-/dashboard')
             ->middleware(['web', 'dashboard'])
             ->namespace($this->namespace . '\Dashboard')
             ->group(base_path('routes/dashboard.php'));

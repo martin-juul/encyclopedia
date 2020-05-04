@@ -39,6 +39,10 @@ class User extends Authenticatable implements MustVerifyEmail
 {
     use Notifiable;
 
+    protected $keyType = 'string';
+
+    protected $dateFormat = 'Y-m-d H:i:sO';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -69,6 +73,11 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function getRoleName()
+    {
+        return $this->isAdmin() ? __('Admin') : __('User');
+    }
 
     public function isAdmin(): bool
     {
