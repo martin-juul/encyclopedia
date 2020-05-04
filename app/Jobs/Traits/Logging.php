@@ -57,6 +57,11 @@ trait Logging
             ],
         ];
 
-        Log::channel(Channel::JOBS)->log($level, $message, ArrExt::dotKeys($context));
+        $channel = Channel::JOBS;
+        if (in_array($level, ['debug', 'info', 'notice'])) {
+            $channel = Channel::STDOUT;
+        }
+
+        Log::channel($channel)->log($level, $message, ArrExt::dotKeys($context));
     }
 }
