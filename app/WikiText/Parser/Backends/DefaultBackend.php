@@ -6,6 +6,8 @@ use Log;
 
 class DefaultBackend
 {
+    use EncapsulatesInline;
+
     private $interwiki;
 
     /**
@@ -26,26 +28,6 @@ class DefaultBackend
         }
 
         return $arg[0];
-    }
-
-    /**
-     * Encapsulate inline elements
-     *
-     * @param string $text        parsed text contained within this element
-     * @param string $elementName the name of the element
-     *
-     * @return string Correct markup for this element
-     */
-    public function encapsulateElement(string $elementName, string $text): string
-    {
-        $fn = [$this, 'encapsulate' . ucfirst($elementName)];
-
-        if (is_callable($fn)) {
-            /* If a function is defined to encapsulate this, use it */
-            return $fn($text);
-        }
-
-        return $text;
     }
 
     public function renderLineBlock($elementName, $list)
@@ -223,7 +205,9 @@ class DefaultBackend
                 $info['url'] = $info['target'];
                 $info['caption'] = '';
                 return $this->renderFile($info, $arg);
-            } else if (isset($this->interwiki[$info['namespace']])) {
+            }
+
+            if (isset($this->interwiki[$info['namespace']])) {
                 /* We have a known namespace */
                 $site = $this->interwiki[$info['namespace']];
                 $info['url'] = str_replace('$1', $info['target'], $site);
@@ -248,121 +232,114 @@ class DefaultBackend
             $ext = '';
         } else {
             $pos++;
-            $ext = substr($target, $pos, strlen($target) - $pos);
+            $ext = substr($target, $pos);
         }
 
-        switch ($ext) {
-            case 'jpg':
-            case 'jpeg':
-            case 'png':
-            case 'gif':
-            case 'svg':
-                /* Image flags parsed. From: http://www.mediawiki.org/wiki/Help:Images */
+        if (\in_array($ext, ['jpg', 'jpeg', 'png', 'gif', 'svg'])) {
+            /* Image flags parsed. From: http://www.mediawiki.org/wiki/Help:Images */
 
-                /* Named arguments */
-                if (isset($arg['link'])) { // |link=
-                    $info['url'] = $arg['link'];
-                    $info['link'] = $arg['link'];
-                    unset($arg['link']);
-                }
-                if (isset($arg['class'])) { // |class=
-                    $info['class'] = $arg['class'];
-                    unset($arg['class']);
-                }
-                if (isset($arg['alt'])) { // |alt=
-                    $info['title'] = $arg['alt'];
-                    unset($arg['alt']);
-                }
-                if (isset($arg['page'])) { // |alt=
-                    $info['page'] = $arg['page'];
-                    unset($arg['page']);
-                }
+            /* Named arguments */
+            if (isset($arg['link'])) { // |link=
+                $info['url'] = $arg['link'];
+                $info['link'] = $arg['link'];
+                unset($arg['link']);
+            }
+            if (isset($arg['class'])) { // |class=
+                $info['class'] = $arg['class'];
+                unset($arg['class']);
+            }
+            if (isset($arg['alt'])) { // |alt=
+                $info['title'] = $arg['alt'];
+                unset($arg['alt']);
+            }
+            if (isset($arg['page'])) { // |alt=
+                $info['page'] = $arg['page'];
+                unset($arg['page']);
+            }
 
-                foreach ($arg as $key => $item) {
-                    /* Figure out unnamed arguments */
-                    if (is_numeric($key)) { /* Any unsupported named arguments will be ignored */
-                        if (strpos($item, 'px') === 0) {
-                            /* Size */
-                            // TODO
-                        } else {
-                            /* Load recognised switches */
-                            switch ($item) {
-                                case 'frameless':
-                                    $info['frameless'] = true;
-                                    break;
-                                case 'border':
-                                    $info['border'] = true;
-                                    break;
-                                case 'frame':
-                                    $info['frame'] = true;
-                                    break;
-                                case 'thumbnail':
-                                case 'thumb':
-                                    $info['thumbnail'] = true;
-                                    break;
-                                case 'left':
-                                    $info['left'] = true;
-                                    break;
-                                case 'right':
-                                    $info['right'] = true;
-                                    break;
-                                case 'center':
-                                    $info['center'] = true;
-                                    break;
-                                case 'none':
-                                    $info['none'] = true;
-                                    break;
-                                default:
-                                    $info['caption'] = $item;
-                            }
+            foreach ($arg as $key => $item) {
+                /* Figure out unnamed arguments */
+                if (is_numeric($key)) { /* Any unsupported named arguments will be ignored */
+                    if (strpos($item, 'px') === 0) {
+                        /* Size */
+                        // TODO
+                    } else {
+                        /* Load recognised switches */
+                        switch ($item) {
+                            case 'frameless':
+                                $info['frameless'] = true;
+                                break;
+                            case 'border':
+                                $info['border'] = true;
+                                break;
+                            case 'frame':
+                                $info['frame'] = true;
+                                break;
+                            case 'thumbnail':
+                            case 'thumb':
+                                $info['thumbnail'] = true;
+                                break;
+                            case 'left':
+                                $info['left'] = true;
+                                break;
+                            case 'right':
+                                $info['right'] = true;
+                                break;
+                            case 'center':
+                                $info['center'] = true;
+                                break;
+                            case 'none':
+                                $info['none'] = true;
+                                break;
+                            default:
+                                $info['caption'] = $item;
                         }
                     }
                 }
+            }
 
-                $info = $this->getImageInfo($info);
+            $info = $this->getImageInfo($info);
 
-                if ($info['namespaceignore'] || !$info['exists']) {
-                    /* Only link to the image, do not display it */
-                    if ($info['caption'] === '') {
-                        $info['caption'] = $info['target'];
-                    }
-                    /* Construct link */
-                    return '<a href="' . htmlspecialchars($info['url']) . '" title="' . htmlspecialchars($info['title']) . '"' . (!$info['exists'] ? ' class="new"' : '') . '>' . $info['caption'] . "</a>";
+            if ($info['namespaceignore'] || !$info['exists']) {
+                /* Only link to the image, do not display it */
+                if ($info['caption'] === '') {
+                    $info['caption'] = $info['target'];
                 }
-
-                $dend = $dstart = '';
-                if (isset($info['thumbnail']) || isset($info['frame'])) {
-                    if (isset($info['right'])) {
-                        $align = ' tright';
-                    } else if (isset($info['left'])) {
-                        $align = ' tleft';
-                    } else {
-                        $align = '';
-                    }
-                    $dstart = "<div class=\"thumb$align\">";
-                    if ($info['caption'] !== '') {
-                        $dend .= '<div class="thumbcaption">' . htmlspecialchars($info['caption']) . '</div>';
-                    }
-                    $dend .= '</div>';
-                }
-
-                $classes = null;
-                if (isset($info['caption']) && $info['caption'] === 'flagicon') {
-                    $classes = 'flagicon';
-                }
-
-                if ($classes !== null) {
-                    $classes = 'class="' . $classes . '"';
-                }
-
                 /* Construct link */
-                return "$dstart<a href=\"" . htmlspecialchars($info['url']) . '"><img ' . $classes . ' src="' . htmlspecialchars($info['thumb']) . '" alt="' . htmlspecialchars($info['title']) . "\" /></a>$dend";
+                return '<a href="' . htmlspecialchars($info['url']) . '" title="' . htmlspecialchars($info['title']) . '"' . (!$info['exists'] ? ' class="new"' : '') . '>' . $info['caption'] . "</a>";
+            }
 
-                break;
-            default:
-                /* Something unsupported */
-                return '<b>(unsupported media file)</b>';
+            $dend = $dstart = '';
+            if (isset($info['thumbnail']) || isset($info['frame'])) {
+                if (isset($info['right'])) {
+                    $align = ' tright';
+                } else if (isset($info['left'])) {
+                    $align = ' tleft';
+                } else {
+                    $align = '';
+                }
+                $dstart = "<div class=\"thumb$align\">";
+                if ($info['caption'] !== '') {
+                    $dend .= '<div class="thumbcaption">' . htmlspecialchars($info['caption']) . '</div>';
+                }
+                $dend .= '</div>';
+            }
+
+            $classes = null;
+            if (isset($info['caption']) && $info['caption'] === 'flagicon') {
+                $classes = 'flagicon';
+            }
+
+            if ($classes !== null) {
+                $classes = 'class="' . $classes . '"';
+            }
+
+            /* Construct link */
+            return "$dstart<a href=\"" . htmlspecialchars($info['url']) . '"><img ' . $classes . ' src="' . htmlspecialchars($info['thumb']) . '" alt="' . htmlspecialchars($info['title']) . "\" /></a>$dend";
         }
+
+        /* Something unsupported */
+        return '<b>(unsupported media file)</b>';
     }
 
     public function renderFlagicon($arg)
@@ -432,37 +409,6 @@ class DefaultBackend
         $href = $arg[0];
 
         return "<a rel='nofollow' class='external' target='_blank' href='{$href}'>{$caption}</a>";
-
-        // return '<a href="' . htmlspecialchars($destination) . '" class="external">' . $caption . '</a>';
-    }
-
-    /**
-     * Default encapsulation for '''bold'''
-     *
-     * @param string $text Text to make bold
-     *
-     * @return string
-     */
-    public function encapsulateBold($text): string
-    {
-        return "<b>{$text}</b>";
-    }
-
-    /**
-     * Default encapsulation for ''italic''
-     *
-     * @param string $text Text to make bold
-     *
-     * @return string
-     */
-    public function encapsulateItalic($text): string
-    {
-        return "<i>{$text}</i>";
-    }
-
-    public function encapsulateParagraph($text): string
-    {
-        return "<p>{$text}</p>" . PHP_EOL;
     }
 
     /**
