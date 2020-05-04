@@ -2,9 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\ArticleResource;
 use App\Models\Article;
-use App\Utilities\Parser\WikiText\WikitextParser;
+use App\WikiText\Parser\WikitextParser;
 use Illuminate\Http\Request;
 
 class ArticleController extends Controller
