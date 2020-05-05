@@ -1,5 +1,7 @@
 # Wikitext Parser
 
+[Official specification](https://en.wikipedia.org/wiki/Help:Wikitext)
+
 The custom implementation is there, as wikipedia does not offer a (in my mind) workable solution.
 Theirs depend on way too many wikimedia components, to use in this project (requires the whole framework as of 2020).
 
