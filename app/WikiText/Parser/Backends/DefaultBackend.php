@@ -2,16 +2,18 @@
 
 namespace App\WikiText\Parser\Backends;
 
+use App\View\Components\InfoBox;
 use Log;
 
-class DefaultBackend
+class DefaultBackend implements WikiTextBackend
 {
     use EncapsulatesInline;
 
     private $interwiki;
 
     /**
-     * Process an element which has arguments. Links, lists and templates fall under this category
+     * Process an element which has arguments.
+     * Links, lists and templates fall under this category
      *
      * @param string $elementName
      * @param array|string $arg
@@ -30,7 +32,7 @@ class DefaultBackend
         return $arg[0];
     }
 
-    public function renderLineBlock($elementName, $list)
+    public function renderLineBlock(string $elementName, array $list): string
     {
         $fn = [$this, 'render' . ucfirst($elementName)];
 
@@ -84,13 +86,13 @@ class DefaultBackend
      * Render list and any sub-lists recursively
      *
      * @param string $token The type of list (expect ul, ol, dl)
-     * @param mixed $list   The hierachy representing this list
+     * @param array $list   The hierachy representing this list
      *
      * @param int $expectedDepth
      *
      * @return string HTML markup for the list
      */
-    public function renderList($token, $list, $expectedDepth = 1): string
+    public function renderList($token, array $list, $expectedDepth = 1): string
     {
         $outp = '';
         $subtoken = 'li';
@@ -409,6 +411,11 @@ class DefaultBackend
         $href = $arg[0];
 
         return "<a rel='nofollow' class='external' target='_blank' href='{$href}'>{$caption}</a>";
+    }
+
+    public function renderInfobox($title, $table)
+    {
+        return (new InfoBox($title, $table))->render();
     }
 
     /**

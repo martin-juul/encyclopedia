@@ -10893,3 +10893,7 @@ a.external {
   height: 12px;
 }
 
+.infobox > caption {
+  caption-side: top !important;
+}
+

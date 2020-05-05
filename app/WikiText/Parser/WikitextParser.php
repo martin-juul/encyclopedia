@@ -7,9 +7,13 @@ use League\ISO3166\ISO3166;
 
 class WikitextParser
 {
-    public const VERSION = '1.0';
-    public const MAX_INCLUDE_DEPTH = 32; /* Depth of template includes to put up with. set to 0 to disallow inclusion, negative to remove the limit */
+    /**
+     * Depth of template includes to put up with.
+     * Set to 0 to disallow inclusion, negative to remove the limit.
+     */
+    public const MAX_INCLUDE_DEPTH = 32;
 
+    /** @var \App\WikiText\Parser\Backends\WikiTextBackend */
     public static $backend;
 
     private static $inline;
@@ -61,6 +65,37 @@ class WikitextParser
     private array $params;
 
     /**
+     * Initialise a new parser object and parse a standalone document.
+     * If templates are included, each will processed by a different instance of this object
+     *
+     * @param string $text The text to parse
+     * @param array $params
+     */
+    public function __construct(string $text, array $params = [])
+    {
+        if (self::$initialised === false) {
+            self::init();
+        }
+
+        $this->params = $params;
+        $this->preprocessed = $this->preprocessText(self::explodeString($text));
+
+        /* Now divide into paragraphs */
+        // TODO operate on arrays instead of strings here
+        $sections = explode("\n\n", str_replace("\r\n", "\n", $this->preprocessed));
+
+        $newtext = [];
+        foreach ($sections as $section) {
+            /* Newlines at the start/end have special meaning (compare to how this is called from parseLineBlock) */
+            $sectionChars = self::explodeString("\n" . $section);
+            $result = $this->parseInline($sectionChars, 'p');
+            $newtext[] = $result['parsed'];
+        }
+
+        $this->result = implode($newtext);
+    }
+
+    /**
      * Definitions for tokens with special meaning to the parser
      *
      * @param array $sharedVars
@@ -105,6 +140,7 @@ class WikitextParser
         ];
 
         self::$preprocessor = [
+            'infobox'     => new ParserInlineElement('{{Infobox', "\n}}", '|', '='),
             'noinclude'   => new ParserInlineElement('<noinclude>', '</noinclude>'),
             'includeonly' => new ParserInlineElement('<includeonly>', '</includeonly>'),
             'arg'         => new ParserInlineElement('{{{', '}}}', '|', '', 1),
@@ -116,7 +152,7 @@ class WikitextParser
         self::$initialised = true;
     }
 
-    private static function elementLookupTable(array $elements)
+    private static function elementLookupTable(array $elements): array
     {
         $lookup = [];
         foreach ($elements as $key => $token) {
@@ -141,37 +177,6 @@ class WikitextParser
     public static function parse(string $text): string
     {
         return (new static($text))->result;
-    }
-
-    /**
-     * Initialise a new parser object and parse a standalone document.
-     * If templates are included, each will processed by a different instance of this object
-     *
-     * @param string $text The text to parse
-     * @param array $params
-     */
-    public function __construct(string $text, array $params = [])
-    {
-        if (self::$initialised === false) {
-            self::init();
-        }
-
-        $this->params = $params;
-        $this->preprocessed = $this->preprocessText(self::explodeString($text));
-
-        /* Now divide into paragraphs */
-        // TODO operate on arrays instead of strings here
-        $sections = explode("\n\n", str_replace("\r\n", "\n", $this->preprocessed));
-
-        $newtext = [];
-        foreach ($sections as $section) {
-            /* Newlines at the start/end have special meaning (compare to how this is called from parseLineBlock) */
-            $sectionChars = self::explodeString("\n" . $section);
-            $result = $this->parseInline($sectionChars, 'p');
-            $newtext[] = $result['parsed'];
-        }
-
-        $this->result = implode($newtext);
     }
 
     /**
@@ -201,6 +206,7 @@ class WikitextParser
     {
         $parsed = '';
         $len = count($textChars);
+        $infoboxHit = false;
 
         for ($i = 0; $i < $len; $i++) {
             $hit = false;
@@ -234,12 +240,15 @@ class WikitextParser
                         break;
                     }
 
+                    if ($key === 'infobox') {
+                        $infoboxHit = true;
+                    }
+
                     /* Seek until end tag, looking for splitters */
                     $innerArg = [];
                     $innerBuffer = '';
                     $innerCurKey = '';
 
-                    /** @noinspection PhpSillyAssignmentInspection */
                     /** @noinspection SuspiciousLoopInspection */
                     for ($i = $i; $i < $len; $i++) {
                         $innerHit = false;
@@ -272,18 +281,9 @@ class WikitextParser
                                 }
                             } else if ($key === 'flagicon') {
                                 /* Load arg of flagicon, and preprocess it */
-                                try {
-                                    $isoCountry = (new ISO3166)->alpha3(strtolower($innerArg[0]));
-
-                                    $link = asset('/assets/icons/country-flag/' . strtolower($isoCountry['alpha2']) . '.svg');
-
-                                    $parsed .= '[[File:' . $link . '|flagicon|url=' . $link . ']]';
-                                } catch (\Exception $e) {
-                                    \Log::error($e->getMessage(), [
-                                        'exception.code' => $e->getCode(),
-                                        'exception.line' => $e->getLine(),
-                                    ]);
-                                }
+                                $this->processFlagIcon($innerArg[0], $parsed);
+                            } else if ($key === 'infobox') {
+                                $parsed .= self::$backend->renderInfobox($innerCurKey, $innerArg);
                             }
 
                             $innerCurKey = ''; // Reset key
@@ -879,5 +879,25 @@ class WikitextParser
         }
 
         return ['child' => $children, 'not' => $not];
+    }
+
+    /**
+     * @param $str
+     * @param string $parsed
+     */
+    private function processFlagIcon($str, string &$parsed): void
+    {
+        try {
+            $isoCountry = (new ISO3166)->alpha3(strtolower($str));
+
+            $link = asset('/assets/icons/country-flag/' . strtolower($isoCountry['alpha2']) . '.svg');
+
+            $parsed .= '[[File:' . $link . '|flagicon|url=' . $link . ']]';
+        } catch (\Exception $e) {
+            \Log::error($e->getMessage(), [
+                'exception.code' => $e->getCode(),
+                'exception.line' => $e->getLine(),
+            ]);
+        }
     }
 }

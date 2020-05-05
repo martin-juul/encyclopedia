@@ -14,7 +14,13 @@ class ParserInlineElement
     public $hasArgs;
     public int $argLimit;
 
-    public function __construct(string $startTag, string $endTag, string $argSep = '', string $argNameSep = '', int $argLimit = 0)
+    public function __construct(
+        string $startTag,
+        string $endTag,
+        string $argSep = '',
+        string $argNameSep = '',
+        int $argLimit = 0
+    )
     {
         $this->startTag = str_split($startTag);
         $this->endTag = str_split($endTag);
