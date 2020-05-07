@@ -26,7 +26,7 @@ class FinishedListener
      */
     public function handle(CommandFinished $event): void
     {
-        if (!config('profiling.enabled') && !PostgresDatabase::isMigrated()) {
+        if (!config('profiling.enabled') || !PostgresDatabase::isMigrated()) {
             return;
         }
 

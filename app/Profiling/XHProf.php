@@ -31,7 +31,7 @@ class XHProf
     public function start(?int $flags = null, array $options = []): void
     {
         // safeguard against non-migrated database
-        if (!PostgresDatabase::isMigrated()) {
+        if (!PostgresDatabase::isMigrated() || !config('profiling.enabled')) {
             return;
         }
 
@@ -49,6 +49,10 @@ class XHProf
 
     public function stop(): ?array
     {
+        if (!config('profiling.enabled')) {
+            return null;
+        }
+
         if (!$this->sampleOnly) {
             return xhprof_disable();
         }
