@@ -11,10 +11,14 @@ class RequestIdService
     /**
      * Get the unique request id
      *
-     * @return string
+     * @return string|null
      */
-    public function get(): string
+    public function get(): ?string
     {
+        if (!config('logging.request.enable')) {
+            return null;
+        }
+
         if (!$this->id) {
             $this->id = $this->generateId();
         }

@@ -20,15 +20,21 @@ class ProfileRequest
      */
     public function handle($request, Closure $next, bool $sampleOnly = false)
     {
-        $xhprof = app(XHProf::class);
-        $xhprof->setSampleOnly($sampleOnly);
-        $xhprof->start();
+        if (config('profiling.enabled')) {
+            $xhprof = app(XHProf::class);
+            $xhprof->setSampleOnly($sampleOnly);
+            $xhprof->start();
+        }
 
         return $next($request);
     }
 
     public function terminate($request, $response): void
     {
+        if (!config('profiling.enabled')) {
+            return;
+        }
+
         $xhprof = app(XHProf::class)->stop();
         $context = new RequestContext($request);
 

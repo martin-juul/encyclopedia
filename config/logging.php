@@ -19,6 +19,10 @@ return [
 
     'default' => env('LOG_CHANNEL', 'stack'),
 
+    'request' => [
+        'enable' => env('LOG_REQUESTS', false),
+    ],
+
     /*
     |--------------------------------------------------------------------------
     | Log Channels

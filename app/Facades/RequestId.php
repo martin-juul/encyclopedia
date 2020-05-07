@@ -5,7 +5,7 @@ namespace App\Facades;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static string get()
+ * @method static string|null get()
  *
  * @see \App\Services\Http\RequestIdService
  */

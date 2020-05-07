@@ -5,8 +5,6 @@ namespace App\Http\Middleware;
 use App\Facades\RequestId;
 use App\Logging\Channel;
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class RequestLogger
 {
@@ -20,14 +18,25 @@ class RequestLogger
      */
     public function handle($request, Closure $next)
     {
-        $request->attributes->add(['request_id' => RequestId::get()]);
+        if (config('logging.request.enable')) {
+            $request->attributes->add(['request_id' => RequestId::get()]);
+        }
 
         return $next($request);
     }
 
-    public function terminate(Request $request, Response $response): void
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @param \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse $response
+     */
+    public function terminate($request, $response): void
     {
+        if (!config('logging.request.enable')) {
+            return;
+        }
+
         \Log::channel(Channel::REQUESTS)->info('request', [
+            'id'          => RequestId::get(),
             'client'      => $request->getClientIp(),
             'fingerprint' => $request->fingerprint(),
             'url'         => $request->url(),
