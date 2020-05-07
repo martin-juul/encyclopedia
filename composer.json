@@ -21,12 +21,10 @@
         "laravel/horizon": "^4.3",
         "laravel/scout": "^8.0",
         "laravel/tinker": "^2.0",
-        "laravel/ui": "^2.0",
         "league/flysystem-aws-s3-v3": "^1.0",
         "league/flysystem-cached-adapter": "^1.0",
         "league/iso3166": "^2.1",
         "meilisearch/meilisearch-laravel-scout": "^0.10.0",
-        "mike42/wikitext": "dev-master",
         "spatie/laravel-responsecache": "^6.6",
         "spatie/laravel-searchable": "^1.6"
     },

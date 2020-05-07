@@ -3,6 +3,7 @@
 /public/storage
 /public/assets/fonts/*
 /storage/*.key
+/storage/*.pem
 /vendor
 .env
 .env.backup
