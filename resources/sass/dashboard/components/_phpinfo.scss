@@ -1,0 +1,14 @@
+.phpinfo {
+  max-height: 60vh;
+  overflow-y: scroll;
+
+  table {
+    tbody {
+      white-space: pre-wrap;
+    }
+
+    td {
+      word-break: break-word;
+    }
+  }
+}

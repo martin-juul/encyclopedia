@@ -13,42 +13,46 @@
         <div class="sidebar-menu">
             <ul>
                 <li class="header-menu">
-                    <span>General</span>
+                    <span>{{ __('dashboard.sidebar.general') }}</span>
                 </li>
                 <li class="sidebar-dropdown">
                     <a href="#">
                         <i class="fa fa-folder"></i>
-                        <span>Articles</span>
+                        <span>{{ __('dashboard.sidebar.articles') }}</span>
                     </a>
                     <div class="sidebar-submenu">
                         <ul>
                             <li>
-                                <a href="#">
-                                    Overview
+                                <a href="{{ route('dashboard.articles.overview') }}">
+                                    {{ __('dashboard.sidebar.overview') }}
                                 </a>
                             </li>
                             <li>
-                                <a href="#">
-                                    Import
-                                </a>
+                                <a href="#">{{ __('dashboard.sidebar.import') }}</a>
                             </li>
                         </ul>
                     </div>
                 </li>
 
                 <li class="header-menu">
-                    <span>System</span>
+                    <span>{{ __('dashboard.sidebar.system') }}</span>
+                </li>
+                <li>
+                    <a href="{{ route('dashboard.system.overview') }}">
+                        <i class="fa fa-folder"></i>
+                        {{ __('dashboard.sidebar.overview') }}
+                    </a>
                 </li>
                 <li>
                     <a href="#">
                         <i class="fa fa-book"></i>
-                        <span>Profiling</span>
+                        <span>{{ __('dashboard.sidebar.profiling') }}</span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <i class="fa fa-calendar"></i>
-                        <span>Metrics</span>
+                        <span>{{ __('dashboard.sidebar.metrics') }}</span>
                     </a>
                 </li>
 

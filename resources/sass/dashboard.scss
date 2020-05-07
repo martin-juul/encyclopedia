@@ -1,5 +1,7 @@
 @import '~bootstrap/scss/bootstrap';
 
+@import 'dashboard/components/phpinfo';
+
 @keyframes sonar {
   0% {
     transform: scale(0.9);
