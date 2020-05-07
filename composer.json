@@ -16,7 +16,6 @@
         "fruitcake/laravel-cors": "^1.0",
         "genealabs/laravel-model-caching": "*",
         "guzzlehttp/guzzle": "^6.3",
-        "hhxsv5/laravel-s": "~3.7.0",
         "laravel/framework": "^7.0",
         "laravel/horizon": "^4.3",
         "laravel/scout": "^8.0",

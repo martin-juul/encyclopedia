@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3b1051ea9275cfeac28d346256a33c2f",
+    "content-hash": "d26b8206188b55042bdd3f6524aebfd8",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1221,94 +1221,6 @@
                 "url"
             ],
             "time": "2019-07-01T23:21:34+00:00"
-        },
-        {
-            "name": "hhxsv5/laravel-s",
-            "version": "v3.7.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/hhxsv5/laravel-s.git",
-                "reference": "5d88d5eff3e89c46c8df931b909561dda5ec36b2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/hhxsv5/laravel-s/zipball/5d88d5eff3e89c46c8df931b909561dda5ec36b2",
-                "reference": "5d88d5eff3e89c46c8df931b909561dda5ec36b2",
-                "shasum": ""
-            },
-            "require": {
-                "ext-json": "*",
-                "ext-pcntl": "*",
-                "php": ">=5.5.9",
-                "swoole/ide-helper": "@dev",
-                "symfony/console": ">=2.7.0"
-            },
-            "suggest": {
-                "ext-inotify": "Inotify, used to real-time reload.",
-                "ext-swoole": "Coroutine based Async PHP programming framework, require >= 1.7.19."
-            },
-            "bin": [
-                "bin/fswatch"
-            ],
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Hhxsv5\\LaravelS\\Illuminate\\LaravelSServiceProvider"
-                    ]
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Hhxsv5\\LaravelS\\": "src"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Xie Biao",
-                    "email": "hhxsv5@sina.com"
-                }
-            ],
-            "description": "🚀 LaravelS is an out-of-the-box adapter between Swoole and Laravel/Lumen.",
-            "homepage": "https://github.com/hhxsv5/laravel-s",
-            "keywords": [
-                "LaravelS",
-                "async",
-                "coroutine",
-                "http",
-                "inotify",
-                "laravel",
-                "laravel-s",
-                "lumen",
-                "performance",
-                "process",
-                "server",
-                "swoole",
-                "task",
-                "tcp",
-                "timer",
-                "udp",
-                "websocket"
-            ],
-            "funding": [
-                {
-                    "url": "https://gitee.com/hhxsv5/laravel-s?donate=true",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.blockchain.com/btc/address/33owCwMDZBikNe3SY1nnyJ64cEyP7i3mcU",
-                    "type": "custom"
-                },
-                {
-                    "url": "https://www.paypal.me/hhxsv5",
-                    "type": "custom"
-                }
-            ],
-            "time": "2020-04-02T08:08:09+00:00"
         },
         {
             "name": "http-interop/http-factory-guzzle",
@@ -3660,40 +3572,6 @@
                 "mailer"
             ],
             "time": "2019-11-12T09:31:26+00:00"
-        },
-        {
-            "name": "swoole/ide-helper",
-            "version": "4.5.0",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/swoole/ide-helper.git",
-                "reference": "bfc9e789a6bf90775da9a3095e7877899deb6a2d"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/swoole/ide-helper/zipball/bfc9e789a6bf90775da9a3095e7877899deb6a2d",
-                "reference": "bfc9e789a6bf90775da9a3095e7877899deb6a2d",
-                "shasum": ""
-            },
-            "require-dev": {
-                "guzzlehttp/guzzle": "~6.5.0",
-                "squizlabs/php_codesniffer": "~3.5.0",
-                "symfony/filesystem": "~4.3.0",
-                "zendframework/zend-code": "~3.3.0"
-            },
-            "type": "library",
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "Apache-2.0"
-            ],
-            "authors": [
-                {
-                    "name": "Team Swoole",
-                    "email": "team@swoole.com"
-                }
-            ],
-            "description": "IDE help files for Swoole.",
-            "time": "2020-04-26T18:12:57+00:00"
         },
         {
             "name": "symfony/console",
