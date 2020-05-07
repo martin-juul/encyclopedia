@@ -4,7 +4,7 @@ return [
     'home' => 'Hjem',
 
     'sidebar' => [
-        'general'  => 'Generalt',
+        'general'  => 'Generelt',
         'articles' => 'Artikler',
         'import'   => 'Importering',
 
