@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\WikiText\Parser\Backends;
 
@@ -22,6 +23,9 @@ class DefaultBackend implements WikiTextBackend
      */
     public function renderWithArgs(string $elementName, $arg): string
     {
+        if ($elementName === 'small') {
+            dd([$elementName, $arg]);
+        }
         $fn = [$this, 'render' . ucfirst($elementName)];
 
         if (is_callable($fn)) {
@@ -34,6 +38,9 @@ class DefaultBackend implements WikiTextBackend
 
     public function renderLineBlock(string $elementName, array $list): string
     {
+        if ($elementName === 'small') {
+            dd([$elementName, $arg]);
+        }
         $fn = [$this, 'render' . ucfirst($elementName)];
 
         if (is_callable($fn)) {
@@ -69,6 +76,11 @@ class DefaultBackend implements WikiTextBackend
         }
 
         return $outp;
+    }
+
+    public function renderSmall($input)
+    {
+        dd($input);
     }
 
     public function renderPre($token, $lines): string

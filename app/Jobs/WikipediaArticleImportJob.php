@@ -1,31 +1,29 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Jobs;
 
-use App\Jobs\Traits\Logging;
 use App\Models\Article;
-use App\Utilities\Extensions\StrExt;
+use App\Profiling\XDebugHooks;
 use App\Utilities\GC;
 use App\WikiText\Models\WikiPage;
 use App\WikiText\Parser\Parser;
 use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
+use Ds\{Map, Vector};
 
-class WikipediaArticleImportJob implements ShouldQueue
+class WikipediaArticleImportJob extends AbstractJob
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, Logging;
-
     public $timeout = 0;
 
     /** @var string */
     protected $path;
+    /** @var int */
+    protected $batchSize;
 
-    private $create = [];
-    private $update = [];
+    /** @var \Ds\Vector */
+    private $create;
+    /** @var \Ds\Map */
+    private $update;
 
     private $dbErrorCount = 0;
     private const MAX_ERRORS = 3;
@@ -34,10 +32,12 @@ class WikipediaArticleImportJob implements ShouldQueue
      * Create a new job instance.
      *
      * @param string $path
+     * @param int $batchSize
      */
-    public function __construct(string $path)
+    public function __construct(string $path, int $batchSize = 2000)
     {
         $this->path = $path;
+        $this->batchSize = $batchSize;
     }
 
     /**
@@ -49,6 +49,9 @@ class WikipediaArticleImportJob implements ShouldQueue
     {
         Article::disableSearchSyncing();
 
+        $this->create = new Vector;
+        $this->update = new Map;
+
         $parser = new Parser($this->path);
 
         foreach ($parser->read('mediawiki/page') as $node) {
@@ -57,25 +60,24 @@ class WikipediaArticleImportJob implements ShouldQueue
             }
 
             $article = $parser->parseNode($node);
-            $article = $this->formatArticle($article);
+            $article = $this->serializeArticle($article);
 
             if (!Article::whereArticleId($article['article_id'])->exists()) {
-                $this->create[] = $article;
+                $this->create->push($article);
             } else {
-                $this->update[$article['article_id']] = $article;
+                $this->update->put($article['article_id'], $article);
             }
 
             unset($article);
 
-            if (count($this->create) >= 2000) {
+            if ($this->create->count() >= $this->batchSize) {
                 $this->createMany();
-                GC::flush();
+                $this->gcFlush();
             }
 
-            if (count($this->update) >= 500) {
-                $this->createMany();
+            if ($this->update->count() >= $this->batchSize) {
                 $this->updateMany();
-                GC::flush();
+                $this->gcFlush();
             }
 
             if ($this->dbErrorCount >= self::MAX_ERRORS) {
@@ -90,24 +92,33 @@ class WikipediaArticleImportJob implements ShouldQueue
             $this->fail();
         }
 
-        unset($this->create, $this->update, $this->timeout, $parser);
+        unset(
+            $this->path,
+            $this->batchSize,
+            $this->create,
+            $this->update,
+            $this->timeout,
+            $this->dbErrorCount,
+            $parser
+        );
 
         Article::enableSearchSyncing();
-        GC::flush();
+        $this->gcFlush();
     }
 
     private function createMany(): void
     {
-        if (count($this->create) <= 0) {
+        if ($this->create->count() <= 0) {
             return;
         }
 
+        $start = microtime(true);
         try {
             \DB::transaction(function () {
-                Article::insert($this->create);
+                Article::insert($this->create->toArray());
             });
         } catch (\Throwable $e) {
-            $this->error('Transaction error', [
+            $this->error('[DB]: transaction error during batch insert', [
                 'exception' => [
                     'code'    => $e->getCode(),
                     'message' => $e->getMessage(),
@@ -117,15 +128,19 @@ class WikipediaArticleImportJob implements ShouldQueue
 
             ++$this->dbErrorCount;
         }
+        $stop = microtime(true);
 
-        unset($this->create);
+        $time = bcsub($stop, $start);
 
-        $this->create = [];
+        $this->info('[DB]: Insert transaction took ' . $time . ' sec');
+
+        $this->create->clear();
+        usleep(200000);
     }
 
     private function updateMany(): void
     {
-        if (count($this->update) <= 0) {
+        if ($this->update->count() <= 0) {
             return;
         }
 
@@ -136,7 +151,7 @@ class WikipediaArticleImportJob implements ShouldQueue
                 }
             }, 3);
         } catch (\Throwable $e) {
-            $this->error('Transaction error', [
+            $this->error('[DB]: transaction error during batch update', [
                 'exception' => [
                     'code'    => $e->getCode(),
                     'message' => $e->getMessage(),
@@ -147,9 +162,7 @@ class WikipediaArticleImportJob implements ShouldQueue
             ++$this->dbErrorCount;
         }
 
-        unset($this->update);
-
-        $this->update = [];
+        $this->update->clear();
     }
 
     /**
@@ -157,7 +170,7 @@ class WikipediaArticleImportJob implements ShouldQueue
      *
      * @return array
      */
-    private function formatArticle(WikiPage $article): array
+    private function serializeArticle(WikiPage $article): array
     {
         $data = [
             'title'             => $article->title,
@@ -185,5 +198,27 @@ class WikipediaArticleImportJob implements ShouldQueue
         }
 
         return $data;
+    }
+
+    private function gcFlush(): void
+    {
+        $this->xdebugStats();
+
+        $bytes = GC::flushMemoryCaches();
+
+        $this->info("[GC]: Flushed {$bytes} bytes");
+    }
+
+    private function xdebugStats()
+    {
+        if (!extension_loaded('Xdebug')) {
+            return;
+        }
+
+        $mu = xdebug_memory_usage();
+        $pmu = xdebug_peak_memory_usage();
+        $gcRunCount = xdebug_get_gc_run_count();
+
+        \Log::channel('stdout')->info("[XDebug]: (Mem) usage {$mu} peak {$pmu} | (GC) runs {$gcRunCount}");
     }
 }

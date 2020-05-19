@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Utilities;
 
@@ -14,9 +15,8 @@ class GC
         return gc_mem_caches();
     }
 
-    public static function flush(): void
+    public static function flush(): array
     {
-        static::collectCycles();
-        static::flushMemoryCaches();
+        return [static::collectCycles(), static::flushMemoryCaches()];
     }
 }

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers\Api;
 
@@ -24,7 +25,7 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  \App\Models\Article  $article
+     * @param \App\Models\Article $article
      *
      * @return \App\Http\Resources\ArticleResource
      */

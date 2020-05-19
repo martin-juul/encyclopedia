@@ -1,7 +1,8 @@
 <?php
+declare(strict_types=1);
 
 Route::get('/job', function () {
-    $path = '/Volumes/Dev/personal/encyclopedia/storage/dumps/enwiki-20200401-pages-articles-multistream.xml';
+    $path = storage_path('dumps/enwiki-20200401-pages-articles-multistream.xml');
 
     dd(Queue::push(new \App\Jobs\WikipediaArticleImportJob($path)));
 

@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 use App\Logging\Channel;
 use Monolog\Handler\NullHandler;

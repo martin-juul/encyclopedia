@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Models;
 
@@ -10,7 +11,7 @@ use Illuminate\Support\Str;
 /**
  * App\Models\User
  *
- * @property int $id
+ * @property string $id
  * @property bool $is_admin
  * @property string $name
  * @property string $email

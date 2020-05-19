@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\WikiText\Parser;
 
 use App\Utilities\Filesystem\Path;
+use Illuminate\Support\Str;
 
 class XMLParser
 {
@@ -18,6 +20,10 @@ class XMLParser
     {
         if (!Path::isReadable($filePath)) {
             throw new \InvalidArgumentException("Failed to open file: $filePath - Permission denied.");
+        }
+
+        if (Str::endsWith($filePath, ['bz2', 'bzip2'])) {
+            $filePath = "compress.bzip2://$filePath";
         }
 
         $this->reader = new \XMLReader;

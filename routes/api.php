@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 Route::group(['prefix' => 'articles'], function () {
     Route::get('', 'ArticleController@index')->name('api.articles.index');

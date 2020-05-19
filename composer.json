@@ -1,88 +1,90 @@
 {
-    "name": "martin-juul/encyclopedia",
-    "type": "project",
-    "description": "Wikipedia mirror.",
-    "license": "Apache-2.0",
-    "require": {
-        "php": "^7.4.5",
-        "ext-bz2": "*",
-        "ext-json": "*",
-        "ext-libxml": "*",
-        "ext-pdo": "*",
-        "ext-simplexml": "*",
-        "ext-xmlreader": "*",
-        "doctrine/dbal": "^2.10",
-        "fideloper/proxy": "^4.2",
-        "fruitcake/laravel-cors": "^1.0",
-        "genealabs/laravel-model-caching": "*",
-        "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "^7.0",
-        "laravel/horizon": "^4.3",
-        "laravel/scout": "^8.0",
-        "laravel/tinker": "^2.0",
-        "league/flysystem-aws-s3-v3": "^1.0",
-        "league/flysystem-cached-adapter": "^1.0",
-        "league/iso3166": "^2.1",
-        "meilisearch/meilisearch-laravel-scout": "^0.10.0",
-        "spatie/laravel-responsecache": "^6.6",
-        "spatie/laravel-searchable": "^1.6"
-    },
-    "require-dev": {
-        "ext-xhprof": "*",
-        "barryvdh/laravel-ide-helper": "^2.6",
-        "facade/ignition": "^2.0",
-        "fzaninotto/faker": "^1.9.1",
-        "melihovv/laravel-package-generator": "^7.0",
-        "mockery/mockery": "^1.3.1",
-        "nunomaduro/collision": "^4.1",
-        "phpunit/phpunit": "^8.5"
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "sort-packages": true
-    },
-    "extra": {
-        "laravel": {
-            "dont-discover": []
-        }
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "app/"
-        },
-        "classmap": [
-            "database/seeds",
-            "database/factories"
-        ],
-        "files": [
-            "app/Http/Blade/blade_extensions.php",
-            "database/migration_helpers.php"
-        ]
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "Tests\\": "tests/"
-        }
-    },
-    "minimum-stability": "dev",
-    "prefer-stable": true,
-    "scripts": {
-        "post-autoload-dump": [
-            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
-        ],
-        "post-root-package-install": [
-            "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
-        ],
-        "post-create-project-cmd": [
-            "@php artisan key:generate --ansi"
-        ],
-        "ide-helper": [
-            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
-            "php artisan ide-helper:generate",
-            "php artisan ide-helper:meta",
-            "php artisan ide-helper:models --write --reset"
-        ]
+  "name": "martin-juul/encyclopedia",
+  "type": "project",
+  "description": "Wikipedia mirror.",
+  "license": "Apache-2.0",
+  "require": {
+    "php": "^7.4.5",
+    "ext-bz2": "*",
+    "ext-json": "*",
+    "ext-libxml": "*",
+    "ext-pdo": "*",
+    "ext-simplexml": "*",
+    "ext-xmlreader": "*",
+    "doctrine/dbal": "^2.10",
+    "fideloper/proxy": "^4.2",
+    "fruitcake/laravel-cors": "^1.0",
+    "genealabs/laravel-model-caching": "*",
+    "guzzlehttp/guzzle": "^6.3",
+    "laravel/framework": "^7.0",
+    "laravel/horizon": "^4.3",
+    "laravel/scout": "^8.0",
+    "laravel/tinker": "^2.0",
+    "league/flysystem-aws-s3-v3": "^1.0",
+    "league/flysystem-cached-adapter": "^1.0",
+    "league/iso3166": "^2.1",
+    "meilisearch/meilisearch-laravel-scout": "^0.10.0",
+    "php-ds/php-ds": "^1.2",
+    "spatie/laravel-responsecache": "^6.6",
+    "spatie/laravel-searchable": "^1.6"
+  },
+  "require-dev": {
+    "ext-xdebug": "*",
+    "ext-xhprof": "*",
+    "barryvdh/laravel-ide-helper": "^2.6",
+    "facade/ignition": "^2.0",
+    "fzaninotto/faker": "^1.9.1",
+    "melihovv/laravel-package-generator": "^7.0",
+    "mockery/mockery": "^1.3.1",
+    "nunomaduro/collision": "^4.1",
+    "phpunit/phpunit": "^8.5"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "dont-discover": []
     }
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/"
+    },
+    "classmap": [
+      "database/seeds",
+      "database/factories"
+    ],
+    "files": [
+      "app/Http/Blade/blade_extensions.php",
+      "database/migration_helpers.php"
+    ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "scripts": {
+    "post-autoload-dump": [
+      "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+      "@php artisan package:discover --ansi"
+    ],
+    "post-root-package-install": [
+      "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+    ],
+    "post-create-project-cmd": [
+      "@php artisan key:generate --ansi"
+    ],
+    "ide-helper": [
+      "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+      "php artisan ide-helper:generate",
+      "php artisan ide-helper:meta",
+      "php artisan ide-helper:models --write --reset"
+    ]
+  }
 }

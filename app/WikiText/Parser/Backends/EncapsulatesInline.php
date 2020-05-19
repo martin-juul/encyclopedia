@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 
 namespace App\WikiText\Parser\Backends;
 
@@ -51,5 +52,11 @@ trait EncapsulatesInline
     public function encapsulateParagraph($text): string
     {
         return "<p>{$text}</p>" . PHP_EOL;
+    }
+
+    public function encapsulateSmall($text): string
+    {
+        dd($text);
+        return "<small>{$text}</small>";
     }
 }

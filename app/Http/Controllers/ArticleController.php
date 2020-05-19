@@ -1,8 +1,10 @@
 <?php
+declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
 use App\Models\Article;
+use App\WikiText\Parser\TestParser;
 use App\WikiText\Parser\WikitextParser;
 use Illuminate\Http\Request;
 
@@ -53,6 +55,9 @@ class ArticleController extends Controller
     public function showSource(Request $request, string $title)
     {
         $article = Article::whereTitle($title)->firstOrFail();
+
+        $p = new TestParser($article->text);
+        dd($p->parse());
 
         $parser = new WikitextParser($article->text);
 
