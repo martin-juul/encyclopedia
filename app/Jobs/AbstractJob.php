@@ -39,6 +39,17 @@ abstract class AbstractJob implements ShouldQueue
         $this->log(__FUNCTION__, $message, $context);
     }
 
+    protected function errorE(string $message, \Throwable $e)
+    {
+        $this->error($message, [
+            'exception' => [
+                'code'    => $e->getCode(),
+                'line'    => $e->getLine(),
+                'message' => $e->getMessage(),
+            ],
+        ]);
+    }
+
     protected function alert(string $message, array $context = []): void
     {
         $this->log(__FUNCTION__, $message, $context);

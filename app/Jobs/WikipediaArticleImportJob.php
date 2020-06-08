@@ -5,6 +5,8 @@ namespace App\Jobs;
 
 use App\Models\Article;
 use App\Profiling\XDebugHooks;
+use App\Utilities\FlushableMap;
+use App\Utilities\FlushableVector;
 use App\Utilities\GC;
 use App\WikiText\Models\WikiPage;
 use App\WikiText\Parser\Parser;
@@ -19,11 +21,6 @@ class WikipediaArticleImportJob extends AbstractJob
     protected $path;
     /** @var int */
     protected $batchSize;
-
-    /** @var \Ds\Vector */
-    private $create;
-    /** @var \Ds\Map */
-    private $update;
 
     private $dbErrorCount = 0;
     private const MAX_ERRORS = 3;
@@ -49,8 +46,11 @@ class WikipediaArticleImportJob extends AbstractJob
     {
         Article::disableSearchSyncing();
 
-        $this->create = new Vector;
-        $this->update = new Map;
+        $createMany = fn(Vector $items) => $this->createMany($items);
+        $updateMany = fn(Map $items) => $this->updateMany($items);
+
+        $createBuffer = new FlushableVector($this->batchSize, $createMany);
+        $updateBuffer = new FlushableMap($this->batchSize, $updateMany);
 
         $parser = new Parser($this->path);
 
@@ -63,42 +63,31 @@ class WikipediaArticleImportJob extends AbstractJob
             $article = $this->serializeArticle($article);
 
             if (!Article::whereArticleId($article['article_id'])->exists()) {
-                $this->create->push($article);
+                $createBuffer->push($article);
             } else {
-                $this->update->put($article['article_id'], $article);
+                $updateBuffer->set($article['article_id'], $article);
             }
 
             unset($article);
-
-            if ($this->create->count() >= $this->batchSize) {
-                $this->createMany();
-                $this->gcFlush();
-            }
-
-            if ($this->update->count() >= $this->batchSize) {
-                $this->updateMany();
-                $this->gcFlush();
-            }
 
             if ($this->dbErrorCount >= self::MAX_ERRORS) {
                 $this->fail();
             }
         }
 
-        $this->createMany();
-        $this->updateMany();
-
         if ($this->dbErrorCount >= self::MAX_ERRORS) {
             $this->fail();
         }
 
+        $createBuffer->flush();
+        $updateBuffer->flush();
+
         unset(
             $this->path,
             $this->batchSize,
-            $this->create,
-            $this->update,
             $this->timeout,
             $this->dbErrorCount,
+            $createBuffer,
             $parser
         );
 
@@ -106,63 +95,58 @@ class WikipediaArticleImportJob extends AbstractJob
         $this->gcFlush();
     }
 
-    private function createMany(): void
+    private function createMany(Vector $items): void
     {
-        if ($this->create->count() <= 0) {
+        if (!$items instanceof Vector) {
+            throw new \InvalidArgumentException('items must be a Ds\\Vector');
+        }
+        if ($items->count() <= 0) {
             return;
         }
 
         $start = microtime(true);
+
         try {
-            \DB::transaction(function () {
-                Article::insert($this->create->toArray());
+            \DB::transaction(function () use (&$items) {
+                Article::insert($items->toArray());
             });
         } catch (\Throwable $e) {
-            $this->error('[DB]: transaction error during batch insert', [
-                'exception' => [
-                    'code'    => $e->getCode(),
-                    'message' => $e->getMessage(),
-                    'line'    => $e->getMessage(),
-                ],
-            ]);
+            $this->errorE('[DB]: transaction error during batch insert', $e);
 
             ++$this->dbErrorCount;
         }
-        $stop = microtime(true);
 
+        $stop = microtime(true);
         $time = bcsub($stop, $start);
 
+        $this->gcFlush();
         $this->info('[DB]: Insert transaction took ' . $time . ' sec');
 
-        $this->create->clear();
-        usleep(200000);
+        usleep(200000); // allow the database to recover for at bit
     }
 
-    private function updateMany(): void
+    private function updateMany(Map $items): void
     {
-        if ($this->update->count() <= 0) {
+        if (!$items instanceof Map) {
+            throw new \InvalidArgumentException('items must be a Ds\\Map');
+        }
+        if ($items->count() <= 0) {
             return;
         }
 
         try {
-            \DB::transaction(function () {
-                foreach ($this->update as $key => $values) {
+            \DB::transaction(function () use (&$items) {
+                foreach ($items as $key => $values) {
                     Article::whereArticleId($key)->update($values);
                 }
             }, 3);
         } catch (\Throwable $e) {
-            $this->error('[DB]: transaction error during batch update', [
-                'exception' => [
-                    'code'    => $e->getCode(),
-                    'message' => $e->getMessage(),
-                    'line'    => $e->getMessage(),
-                ],
-            ]);
+            $this->errorE('[DB]: transaction error during batch update', $e);
 
             ++$this->dbErrorCount;
         }
 
-        $this->update->clear();
+        $this->gcFlush();
     }
 
     /**
