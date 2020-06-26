@@ -5,19 +5,20 @@ namespace App\Profiling;
 
 use App\Exceptions\Profiling\XHProfExtensionMissing;
 use App\Models\Sys\PostgresDatabase;
+use App\Utilities\PhpConfig;
 
 class XHProf
 {
     protected bool $sampleOnly = false;
 
-    public function __construct()
+    public function __construct(PhpConfig $phpConfig)
     {
         if (!config('profiling.xhprof.enabled')) {
             throw new XHProfExtensionMissing;
         }
 
         if (config('profiling.xhprof.collect_additional_info')) {
-            ini_set('xhprof.collect_additional_info', 1);
+            $phpConfig->set('xhprof.collect_additional_info', '1');
         }
     }
 

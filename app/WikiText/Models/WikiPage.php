@@ -87,7 +87,7 @@ class WikiPage implements Arrayable
         $text = (array)$text;
         $text = $text['0'];
 
-        $this->wikiText = new WikiText($id, $parent_id, $timestamp, $contributor, $comment, $text, $sha1);
+        $this->wikiText = new WikiText((int)$id, $parent_id, $timestamp, $contributor, $comment, $text, $sha1);
     }
 
     protected function getShortDescription(): ?string

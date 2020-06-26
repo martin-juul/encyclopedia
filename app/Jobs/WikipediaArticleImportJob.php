@@ -117,7 +117,7 @@ class WikipediaArticleImportJob extends AbstractJob
         }
 
         $stop = microtime(true);
-        $time = bcsub($stop, $start);
+        $time = bcsub((string)$stop, (string)$start);
 
         $this->gcFlush();
         $this->info('[DB]: Insert transaction took ' . $time . ' sec');

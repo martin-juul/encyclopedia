@@ -56,8 +56,7 @@ class ArticleController extends Controller
     {
         $article = Article::whereTitle($title)->firstOrFail();
 
-        $p = new TestParser($article->text);
-        dd($p->parse());
+        // $p = new TestParser($article->text);
 
         $parser = new WikitextParser($article->text);
 
@@ -71,7 +70,9 @@ class ArticleController extends Controller
 
     public function searchView(Request $request)
     {
-        $articles = $this->searchApi($request);
+        $articles = Article::search($request->query('q'))->paginate();
+
+        dd($articles);
 
         return view('articles.search', [
             'query'    => $request->query('q'),

@@ -5,18 +5,18 @@ namespace App\WikiText\Models;
 
 class WikiText
 {
-    public int $id;
-    public ?int $parent_id;
-    public string $timestamp;
+    public $id;
+    public $parent_id;
+    public $timestamp;
     public ?WikitextContributor $contributor;
     public ?string $comment;
     public ?string $text;
     public string $sha1;
 
     public function __construct(
-        int $id,
-        ?int $parent_id,
-        string $timestamp,
+        $id,
+        $parent_id,
+        $timestamp,
         ?WikitextContributor $contributor,
         ?string $comment,
         ?string $text,

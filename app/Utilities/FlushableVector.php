@@ -18,13 +18,13 @@ class FlushableVector
         $this->cb = $flushFn;
     }
 
-    public function push(...$items)
+    public function push($item): void
     {
         if ($this->check()) {
             $this->flush();
         }
 
-        $this->items->push($items);
+        $this->items->push($item);
     }
 
     public function flush(): int
